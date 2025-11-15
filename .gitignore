@@ -1,0 +1,32 @@
+# Arquivos de cache e bytecode do Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Pastas de ambiente virtual (Virtual Environment)
+venv/
+.venv/
+env/
+.env
+
+# Arquivos de configuração de IDEs e editores
+.vscode/
+.idea/
+.project
+.settings
+*.sublime-project
+*.sublime-workspace
+
+# Arquivos de sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos de banco de dados SQLite
+# (Decida se você quer enviar seu banco de dados ou não)
+*.db
+*.sqlite
+*.sqlite3
+
+# Arquivos de teste
+.pytest_cache/
