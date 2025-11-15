@@ -25,7 +25,13 @@ A modelagem do sistema foi dividida nas seguintes classes, atributos e métodos 
 
 ---
 
-### 2.1. Relacionamentos Principais
+### 2.1. Diagrama de Classes (UML)
+
+Aqui está o diagrama de classes UML que representa a estrutura do sistema:
+
+![Diagrama de Classes UML do Sistema de Quiz](docs/diagrama_classes.png)
+
+### 2.2. Relacionamentos Principais
 
 * **Generalização (Herança):** A classe `MultipleChoiceQuestion` **é-um-tipo-de** `Question`. Ela herda os atributos comuns da classe base e adiciona os seus próprios (`alternatives`, `correct_answer`).
 * **Agregação ("tem-um"):**
@@ -47,3 +53,4 @@ A modelagem do sistema foi dividida nas seguintes classes, atributos e métodos 
 * [ ] **Relatórios:** Gerar estatísticas de desempenho, rankings e mais.
 * [ ] **Persistência:** Salvar e carregar dados em JSON ou SQLite.
 * [ ] **Testes:** Cobertura de testes com `pytest`.
+
