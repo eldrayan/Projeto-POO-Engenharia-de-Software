@@ -29,7 +29,7 @@ A modelagem do sistema foi dividida nas seguintes classes, atributos e métodos 
 
 Aqui está o diagrama de classes UML que representa a estrutura do sistema:
 
-![Diagrama de Classes UML do Sistema de Quiz](docs/diagrama_classes.png)
+![Diagrama de Classes UML do Sistema de Quiz](docs/Diagrama de Classes - Elder Rayan Oliveira Silva.jpg)
 
 ### 2.2. Relacionamentos Principais
 
