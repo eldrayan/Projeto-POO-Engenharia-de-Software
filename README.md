@@ -29,6 +29,10 @@ A modelagem do sistema foi dividida nas seguintes classes, atributos e métodos 
 
 Aqui está o diagrama de classes UML que representa a estrutura do sistema:
 
+```mermaid
+---
+title: Diagrama de Classes - Quiz
+---
 classDiagram
     %% 1. Generalização (Herança)
     class Question {
@@ -106,6 +110,7 @@ classDiagram
     
     User ..> Quiz : Depende (para responder)
     Quiz ..> Settings : Consulta config
+```
 
 ### 2.2. Relacionamentos Principais
 
