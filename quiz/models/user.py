@@ -1,5 +1,5 @@
 from typing import Any, List
-from attempt import Attempt
+from .attempt import Attempt
 
 
 class User:
@@ -13,9 +13,9 @@ class User:
     """
     def __init__(self, id_user: int, email: str, name: str, attempt_counter: int = 0) -> None:
         """Inicializa um objeto User."""
-        self.id_user = id_user
-        self.email = email
-        self.name = name
+        self.__id_user = id_user
+        self.__email = email
+        self.__name = name
         self.__attempt_counter = attempt_counter
 
     @property
@@ -29,9 +29,9 @@ class User:
     @email.setter
     def email(self, new_email):
         if not isinstance(new_email, str) or len(new_email) <= 10 or "@" not in new_email:
-            print("Email Inválido")
+            raise ValueError("O formato do email fornecido é inválido.")
         elif(new_email == self.__email):
-            print("O Email não pode ser o mesmo que o anterior.")
+            raise ValueError("O novo email não pode ser o mesmo que o email atual.")
         else: 
             self.__email = new_email
             
@@ -43,8 +43,9 @@ class User:
     def name(self, new_name):
         if not isinstance(new_name, str) or len(new_name.strip()) == 0:
             print("Nome Inválido")
+            raise ValueError("O nome não pode estar vazio.")
         elif(new_name == self.__name):
-            print("O nome não pode ser o mesmo que o anterior.")
+            raise ValueError("O novo nome não pode ser o mesmo que o nome atual.")
         else: 
             self.__name = new_name
 
@@ -83,4 +84,3 @@ class User:
             attempt_number = self.__attempt_counter
         )
         return attempt
-

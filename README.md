@@ -29,7 +29,83 @@ A modelagem do sistema foi dividida nas seguintes classes, atributos e métodos 
 
 Aqui está o diagrama de classes UML que representa a estrutura do sistema:
 
-![Diagrama de Classes](docs/Diagrama%20de%20Classes%20-%20Elder%20Rayan%20Oliveira%20Silva.jpg)
+classDiagram
+    %% 1. Generalização (Herança)
+    class Question {
+        +id_question
+        +statement
+        +difficulty
+        +theme
+        +__str__()
+        +__eq__()
+    }
+    class MultipleChoiceQuestion {
+        +alternatives
+        +correct_answer
+        +__str__()
+    }
+    Question <|-- MultipleChoiceQuestion : Herda de
+
+    %% 2. Agregação (Tem-um)
+    class Quiz {
+        +id_quiz
+        +title
+        +questions
+        +attempt_limit
+        +time_limit
+        +__str__()
+        +__len__()
+        +__iter__()
+    }
+    %% O Quiz é composto por Questions
+    Quiz "1" o-- "N" Question : Agrega
+
+    class User {
+        +id_user
+        +email
+        +name
+        +answer_quiz()
+    }
+    %% O User possui um histórico de Attempts
+    User "1" o-- "N" Attempt : Possui histórico
+
+    %% 3. Associação Simples (Conhece-um)
+    class Attempt {
+        +id_attempt
+        +id_quiz
+        +id_user
+        +score
+        +time
+        +answers
+        +attempt_number
+        +__str__()
+    }
+    %% A Attempt precisa saber qual é o Quiz
+    Attempt "*" --> "1" Quiz : Referencia
+
+    %% 4. Dependência (Usa-um)
+    class Statistics {
+        <<Service>>
+        +generate_rankings()
+        +show_user_performance()
+        +most_missed_questions()
+        +user_evolution()
+    }
+    class Settings {
+        +id_config
+        +standard_duration
+        +attempt_limit
+        +difficulty_weights
+        +__str__()
+    }
+
+    %% Dependências
+    Statistics ..> User : Processa dados de
+    Statistics ..> Attempt : Processa dados de
+    Statistics ..> Quiz : Processa dados de
+    
+    User ..> Quiz : Depende (para responder)
+    Quiz ..> Settings : Consulta config
 
 ### 2.2. Relacionamentos Principais
 
@@ -80,5 +156,4 @@ Representa uma relação mais fraca, onde uma classe "usa" outra temporariamente
 * [ ] **Usuários e Tentativas:** Cadastrar usuários e salvar seu histórico de tentativas.
 * [ ] **Relatórios:** Gerar estatísticas de desempenho, rankings e mais.
 * [ ] **Persistência:** Salvar e carregar dados em JSON ou SQLite.
-* [ ] **Testes:** Cobertura de testes com `pytest`.
-
+* [X] **Testes:** Cobertura de testes com `pytest`.

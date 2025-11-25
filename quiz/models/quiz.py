@@ -1,5 +1,5 @@
 from typing import List, Any
-from multiplechoicequestion import MultipleChoiceQuestion
+from .multiplechoicequestion import MultipleChoiceQuestion
 
 class Quiz:
     """
@@ -31,7 +31,7 @@ class Quiz:
     @title.setter
     def title(self, new_title):
         if not isinstance(new_title, str) or len(new_title.strip()) == 0:
-            print("Título Inválido")
+            raise ValueError("Título Inválido.")
         else:
             self.__title = new_title
     
@@ -42,7 +42,7 @@ class Quiz:
     @questions.setter
     def questions(self, new_questions):
         if not isinstance(new_questions, list) or len(new_questions) == 0:
-            print("Lista de questões inválida")
+            raise ValueError("Lista de questões inválida.")
         else:
             self.__questions = new_questions
     
@@ -53,7 +53,7 @@ class Quiz:
     @attempt_limit.setter
     def attempt_limit(self, new_attempt_limit):
         if not isinstance(new_attempt_limit, int) or new_attempt_limit <= 0:
-            print("Limite de tentativas inválido")
+            raise ValueError("Limite de tentativas inválido.")
         else:
             self.__attempt_limit = new_attempt_limit
     
@@ -64,7 +64,7 @@ class Quiz:
     @time_limit.setter
     def time_limit(self, new_time_limit):
         if not isinstance(new_time_limit, int) or new_time_limit <= 0:
-            print("Limite de tempo inválido")
+            raise ValueError("Limite de tempo inválido.")
         else:
             self.__time_limit = new_time_limit
         

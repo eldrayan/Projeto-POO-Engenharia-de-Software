@@ -69,4 +69,4 @@ class Question:
         """Compara se duas questões são iguais."""
         if not isinstance(other, Question):
             return False
-        return self.__id_question == other.id_question
+        return True

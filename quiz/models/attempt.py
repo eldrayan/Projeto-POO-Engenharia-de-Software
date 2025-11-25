@@ -42,7 +42,7 @@ class Attempt:
     @score.setter
     def score(self, new_score):
         if not isinstance(new_score, int) or new_score < 0:
-            print("Score Inválido")
+            raise ValueError("Score Inválido.")
         else:
             self.__score = new_score
 
@@ -53,7 +53,7 @@ class Attempt:
     @time.setter
     def time(self, new_time):
         if not isinstance(new_time, (int, float)) or new_time < 0:
-            print("Tempo Inválido")
+            raise ValueError("Tempo Inválido.")
         else:
             self.__time = new_time
 
@@ -64,7 +64,7 @@ class Attempt:
     @answers.setter
     def answers(self, new_answers):
         if not isinstance(new_answers, list):
-            print("Respostas Inválidas")
+            raise ValueError("Respostas Inválidas.")
         else:
             self.__answers = new_answers
 
@@ -75,7 +75,7 @@ class Attempt:
     @attempt_number.setter
     def attempt_number(self, new_attempt_number):
         if not isinstance(new_attempt_number, int) or new_attempt_number <= 0:
-            print("Número de Tentativa Inválido")
+            raise ValueError("Número de Tentativa Inválido.")
         else:
             self.__attempt_number = new_attempt_number
 

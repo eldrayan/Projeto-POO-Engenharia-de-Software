@@ -1,5 +1,5 @@
-from question import Question
 from typing import List
+from .question import Question
 
 class MultipleChoiceQuestion(Question):
     """
@@ -28,7 +28,7 @@ class MultipleChoiceQuestion(Question):
     @alternatives.setter
     def alternatives(self, new_alternatives):
         if not isinstance(new_alternatives, list) or len(new_alternatives) == 0 or len(new_alternatives) > 5 or len(new_alternatives) < 3:
-            print("Alternativas Inválidas")
+            raise ValueError("Alternativas Inválidas.")
         else:
             self.__alternatives = new_alternatives
 
@@ -39,7 +39,7 @@ class MultipleChoiceQuestion(Question):
     @correct_answer.setter
     def correct_answer(self, new_correct_answer):
         if not isinstance(new_correct_answer, int) or new_correct_answer < 0 or new_correct_answer >= len(self.__alternatives):
-            print("Resposta Correta Inválida")
+            raise ValueError("Resposta Correta Inválida.")
         else:
             self.__correct_answer = new_correct_answer
 
