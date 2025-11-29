@@ -11,16 +11,24 @@ class User:
         email (str): O email do usuário para logar.
         name (str): O nome de exibição do usuário.
     """
-    def __init__(self, id_user: int, email: str, name: str, attempt_counter: int = 0) -> None:
+    def __init__(self, email: str, name: str, group: str, id_user: int = None, attempt_counter: int = 0) -> None:
         """Inicializa um objeto User."""
         self.__id_user = id_user
         self.__email = email
         self.__name = name
+        self.__group = group
         self.__attempt_counter = attempt_counter
 
     @property
     def id_user(self):
         return self.__id_user
+
+    @id_user.setter
+    def id_user(self, new_id: int):
+        """Permite definir o ID pela primeira e única vez."""
+        if self.__id_user is not None:
+            raise ValueError("O ID de um usuário já existente não pode ser alterado.")
+        self.__id_user = new_id
 
     @property
     def email(self):
@@ -48,6 +56,17 @@ class User:
             raise ValueError("O novo nome não pode ser o mesmo que o nome atual.")
         else: 
             self.__name = new_name
+            
+    @property
+    def group(self):
+        return self.__group
+    
+    @group.setter
+    def group(self, new_group):
+        if not isinstance(new_group, str) or len(new_group.strip()) == 0:
+            raise ValueError("O nome da turma não pode estar vazio.")
+        else:
+            self.__group = new_group
 
 
         
