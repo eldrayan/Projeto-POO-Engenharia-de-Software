@@ -1,5 +1,5 @@
 
-**Status:** Em Desenvolvimento (Entrega da Semana 1: Modelagem)
+**Status:** Em Desenvolvimento (Entrega da Semana 3: Herança e DB)
 
 ## 1. Descrição do Projeto
 
@@ -111,11 +111,11 @@ classDiagram
 
 O sistema utiliza os quatro tipos principais de relacionamentos da Orientação a Objetos para estruturar os dados e as regras de negócio:
 
-### 2.3 DER do projeto com o SQLite (Até o momento)
+### 2.3 MER do projeto com o SQLite (Até o momento)
 
 ```mermaid
 ---
-title: Diagrama de Entidade-Relacionamento - Quiz
+title: Modelo de Entidade-Relacionamento - Quiz
 ---
 erDiagram
     USERS {
@@ -198,5 +198,5 @@ Representa uma relação mais fraca, onde uma classe "usa" outra temporariamente
 * [ ] **Execução de Quizzes:** Permitir que usuários respondam quizzes e registrar seus resultados.
 * [ ] **Usuários e Tentativas:** Cadastrar usuários e salvar seu histórico de tentativas.
 * [ ] **Relatórios:** Gerar estatísticas de desempenho, rankings e mais.
-* [ ] **Persistência:** Salvar e carregar dados em JSON ou SQLite.
+* [X] **Persistência:** Salvar e carregar dados em JSON ou SQLite.
 * [X] **Testes:** Cobertura de testes com `pytest`.
