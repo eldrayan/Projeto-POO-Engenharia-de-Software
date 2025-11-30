@@ -1,0 +1,4 @@
+{
+    "database_file": "quiz_app.db",
+    "default_attempt_limit": 3
+}

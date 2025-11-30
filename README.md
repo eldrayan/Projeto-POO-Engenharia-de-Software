@@ -5,7 +5,7 @@
 
 Este projeto tem como objetivo o desenvolvimento de um sistema de quiz educacional. O sistema será uma aplicação de linha de comando (CLI) que permite aos usuários criar, gerenciar e responder quizzes com perguntas de múltipla escolha.
 
-O sistema controlará a pontuação, o desempenho por tema, estatísticas de acertos e permitirá a geração de relatórios de progresso por usuário. A persistência dos dados será feita de forma simples, utilizando arquivos JSON ou SQLite (A ser definido).
+O sistema controlará a pontuação, o desempenho por tema, estatísticas de acertos e permitirá a geração de relatórios de progresso por usuário. A persistência dos dados é feita utilizando o SQLite, com as configurações gerenciadas por um arquivo settings.json.
 
 O foco principal do projeto é a aplicação correta de conceitos de Programação Orientada a Objetos (POO), incluindo Herança, Encapsulamento e Composição.
 
@@ -21,7 +21,6 @@ A modelagem do sistema foi dividida nas seguintes classes, atributos e métodos 
 | **Quiz** | `id_quiz`, `title`, `questions`, `attempt_limit`, `time_limit` | `__str__()`, `__len__()`, `__iter__()` |
 | **Attempt** | `id_attempt`, `id_quiz`, `id_user`, `score`, `time`, `answers`, `attempt_number` | `__str__()` |
 | **Statistics** | `(Nenhum - Classe de serviço)` | `generate_rankings()` <br> `show_user_performance()` <br> `most_missed_questions()` <br> `user_evolution()` |
-| **Settings** | `id_config`, `standard_duration`, `attempt_limit`, `difficulty_weights` | `__str__()` |
 
 ---
 
@@ -95,26 +94,65 @@ classDiagram
         +most_missed_questions()
         +user_evolution()
     }
-    class Settings {
-        +id_config
-        +standard_duration
-        +attempt_limit
-        +difficulty_weights
-        +__str__()
+    class ConfigModule {
+        <<Module>>
+        +settings
     }
 
     %% Dependências
     Statistics ..> User : Processa dados de
     Statistics ..> Attempt : Processa dados de
-    Statistics ..> Quiz : Processa dados de
     
     User ..> Quiz : Depende (para responder)
-    Quiz ..> Settings : Consulta config
+    Quiz ..> ConfigModule : Consulta config
 ```
 
 ### 2.2. Relacionamentos Principais
 
 O sistema utiliza os quatro tipos principais de relacionamentos da Orientação a Objetos para estruturar os dados e as regras de negócio:
+
+### 2.3 DER do projeto com o SQLite (Até o momento)
+
+```mermaid
+---
+title: Diagrama de Entidade-Relacionamento - Quiz
+---
+erDiagram
+    USERS {
+        INTEGER id_user PK
+        TEXT email
+        TEXT name
+        TEXT group
+        INTEGER attempt_counter
+    }
+
+    QUIZZES {
+        INTEGER id_quiz PK
+        TEXT title
+        INTEGER attempt_limit
+        INTEGER time_limit
+    }
+
+    QUESTIONS {
+        INTEGER id_question PK
+        INTEGER quiz_id FK
+        TEXT statement
+        TEXT alternatives
+        INTEGER correct_answer
+    }
+
+    ATTEMPTS {
+        INTEGER id_attempt PK
+        INTEGER user_id FK
+        INTEGER quiz_id FK
+        INTEGER score
+        TEXT answers
+    }
+
+    USERS ||--|{ ATTEMPTS : "realiza"
+    QUIZZES ||--|{ QUESTIONS : "contém"
+    QUIZZES ||--|{ ATTEMPTS : "é alvo de"
+```
 
 #### 1. Generalização/Especialização (Herança)
 Representa a relação "é-um-tipo-de".

@@ -6,12 +6,11 @@ from ..models.user import User
 from ..models.quiz import Quiz
 from ..models.multiplechoicequestion import MultipleChoiceQuestion
 from ..models.attempt import Attempt
-
-DB_FILE = "quiz_database.db"
+from ..config import settings
 
 def get_db_connection():
     """"Cria e retorna uma conexão com a base de dados."""
-    conn = sqlite3.connect(DB_FILE)
+    conn = sqlite3.connect(settings["database_file"])
     conn.row_factory = sqlite3.Row
     return conn
 
