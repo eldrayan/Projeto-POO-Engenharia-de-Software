@@ -1,5 +1,8 @@
 import time
+import click
+from .models.user import User
 
+@click.command()
 def start_cli():
     """
     Inicia a Interface de Linha de Comando (CLI) para o sistema de Quiz.
@@ -8,21 +11,31 @@ def start_cli():
 
     while True:
         print("\nO que você gostaria de fazer?")
-        print("1. Iniciar um novo quiz")
-        print("2. Ver pontuações")
-        print("3. Sair")
+        print("1. Criar Quiz")
+        print("2. Responder Quiz")
+        print("3. Relatorio do Usuário atual")
+        print("4. Sair")
         
         choice = input("Digite sua escolha: ")
 
         if choice == '1':
-            run_quiz()
+            print("Prosseguindo para a criação do quiz...") # A ser implementado a logica de criacao de quiz
+            create_quiz()
         elif choice == '2':
-            print("Funcionalidade de ver pontuações ainda não implementada.")
+            print("Escolha um quiz para responder: ") # A ser implementado a logica de escolha e resposta do quiz
+            run_quiz()
         elif choice == '3':
+            print("Gerando relatório do usuário...")
+            print(User.attempt_counter)
+        elif choice == '4':
             print("Até logo!")
             break
         else:
             print("Opção inválida. Tente novamente.")
+
+def create_quiz():
+    print("\nInsira o enunciado da questão: ")
+    pass
 
 def run_quiz():
     """

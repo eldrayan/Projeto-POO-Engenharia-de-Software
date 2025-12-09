@@ -58,3 +58,4 @@ class Statistics:
             list: Histórico de desempenho ordenado por data
         """
         pass
+    

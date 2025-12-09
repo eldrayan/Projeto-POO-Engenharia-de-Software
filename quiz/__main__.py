@@ -13,7 +13,7 @@ def setup_database():
     print("Adicionando usuários para teste (se não existirem)...")
     try:
         user1 = User(id_user=None, email="aluno1@teste.com", name="João Silva", group="Turma A")
-        user2 = User(id_user=None, email="aluno2@teste.com", name="Maria Souza", group="Turma B")
+        user2 = User(id_user=None, email="aluno2@teste.com", name="Maria Souza", group="Turma A")
         data.add_users(user1)
         data.add_users(user2)
         print("Usuários de teste prontos.")
