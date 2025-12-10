@@ -1,4 +1,5 @@
 {
     "database_file": "quiz_app.db",
-    "default_attempt_limit": 3
+    "default_attempt_limit": 3,
+    "min_questions_per_quiz": 1
 }
