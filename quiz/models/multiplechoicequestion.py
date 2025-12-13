@@ -17,9 +17,8 @@ class MultipleChoiceQuestion(Question):
         Chama a classe mãe super() para os atributos herdados.
         """
         super().__init__(id_question, statement, difficulty, theme)
-        
-        self.__alternatives = alternatives
-        self.__correct_answer = correct_answer
+        self.alternatives = alternatives
+        self.correct_answer = correct_answer
     
     @property
     def alternatives(self):

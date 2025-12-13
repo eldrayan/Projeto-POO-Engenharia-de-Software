@@ -122,8 +122,6 @@ erDiagram
         INTEGER id_user PK
         TEXT email
         TEXT name
-        TEXT group
-        INTEGER attempt_counter
     }
 
     QUIZZES {

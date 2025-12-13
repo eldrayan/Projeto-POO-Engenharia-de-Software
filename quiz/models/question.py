@@ -26,12 +26,11 @@ class Question:
     
     @statement.setter
     def statement(self, new_statement):
-        if len(new_statement) > 0:
-            self.__statement = new_statement
-        elif (new_statement == self.__statement):
-            print("O Enunciado não pode ser o mesmo que o anterior.")
-        else: 
-            print("Enunciado Inválido")
+        if not isinstance(new_statement, str) or not new_statement.strip():
+            raise ValueError("Enunciado Inválido")
+        if hasattr(self, '_Question__statement') and new_statement == self.__statement:
+            raise ValueError("O Enunciado não pode ser o mesmo que o anterior.")
+        self.__statement = new_statement
 
     @property
     def difficulty(self):
@@ -39,14 +38,9 @@ class Question:
     
     @difficulty.setter
     def difficulty(self, new_difficulty):
-        if (new_difficulty == 1):
-            self.__difficulty = 1
-        elif (new_difficulty == 2):
-            self.__difficulty = 2
-        elif (new_difficulty == 3):
-            self.__difficulty = 3
-        else: 
-            print("Dificuldade Inválida")
+        if new_difficulty not in [1, 2, 3]:
+            raise ValueError("Dificuldade Inválida")
+        self.__difficulty = new_difficulty
 
     @property
     def theme(self):
@@ -54,12 +48,11 @@ class Question:
     
     @theme.setter
     def theme(self, new_theme):
-        if len(new_theme) > 0:
-            self.__theme = new_theme
-        elif (new_theme == self.__theme):
-            print("O Tema não pode ser o mesmo que o anterior.")
-        else: 
-            print("Tema Inválido")
+        if not isinstance(new_theme, str) or not new_theme.strip():
+            raise ValueError("Tema Inválido")
+        if hasattr(self, '_Question__theme') and new_theme == self.__theme:
+            raise ValueError("O Tema não pode ser o mesmo que o anterior.")
+        self.__theme = new_theme
 
     def __str__(self) -> str:
         """Retorna o enunciado da questão como sua representação em string."""
@@ -69,4 +62,5 @@ class Question:
         """Compara se duas questões são iguais."""
         if not isinstance(other, Question):
             return False
-        return True
+        return self.statement.lower() == other.statement.lower() and \
+               self.theme.lower() == other.theme.lower()

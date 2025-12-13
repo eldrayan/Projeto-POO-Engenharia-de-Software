@@ -3,6 +3,7 @@ import json
 from .config import settings
 from .models.quiz import Quiz
 from .models.multiplechoicequestion import MultipleChoiceQuestion
+from .models.user import User
 from .models.attempt import Attempt
 
 class Database:
@@ -41,21 +42,30 @@ class Database:
                         statement TEXT NOT NULL,
                         difficulty INTEGER NOT NULL,
                         theme TEXT NOT NULL,
-                        alternatives TEXT NOT NULL, -- Armazenado como JSON
+                        alternatives TEXT NOT NULL,
                         correct_answer INTEGER NOT NULL,
                         FOREIGN KEY (id_quiz) REFERENCES quizzes (id_quiz) ON DELETE CASCADE
+                    )
+                """)
+                conn.execute("""
+                    CREATE TABLE IF NOT EXISTS users (
+                        id_user INTEGER PRIMARY KEY AUTOINCREMENT,
+                        name TEXT NOT NULL,
+                        email TEXT NOT NULL UNIQUE
                     )
                 """)
                 conn.execute("""
                     CREATE TABLE IF NOT EXISTS attempts (
                         id_attempt INTEGER PRIMARY KEY AUTOINCREMENT,
                         id_quiz INTEGER NOT NULL,
+                        id_user INTEGER NOT NULL,
                         score INTEGER NOT NULL,
                         time REAL NOT NULL,
-                        answers TEXT NOT NULL, -- Armazenado como JSON
+                        answers TEXT NOT NULL,
                         attempt_number INTEGER NOT NULL,
                         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-                        FOREIGN KEY (id_quiz) REFERENCES quizzes (id_quiz) ON DELETE CASCADE
+                        FOREIGN KEY (id_quiz) REFERENCES quizzes (id_quiz) ON DELETE CASCADE,
+                        FOREIGN KEY (id_user) REFERENCES users (id_user) ON DELETE CASCADE
                     )
                 """)
         finally:
@@ -75,7 +85,7 @@ class Database:
                     "INSERT INTO quizzes (title, attempt_limit, time_limit) VALUES (?, ?, ?)",
                     (quiz.title, quiz.attempt_limit, quiz.time_limit)
                 )
-                id_quiz = cursor.lastrowid 
+                id_quiz = cursor.lastrowid
 
                 questions_data = []
                 for question in quiz.questions:
@@ -101,7 +111,7 @@ class Database:
         """
         conn = self._get_connection()
         try:
-            conn.row_factory = sqlite3.Row  
+            conn.row_factory = sqlite3.Row
             cursor = conn.execute("SELECT id_quiz, title FROM quizzes ORDER BY id_quiz")
             quizzes = cursor.fetchall()
             return [dict(row) for row in quizzes]
@@ -150,11 +160,11 @@ class Database:
         finally:
             conn.close()
 
-    def get_attempt_count_for_quiz(self, quiz_id: int) -> int:
-        """Conta quantas tentativas já foram feitas para um quiz específico."""
+    def get_attempt_count_for_quiz(self, quiz_id: int, user_id: int) -> int:
+        """Conta quantas tentativas um usuário específico já fez para um quiz."""
         conn = self._get_connection()
         try:
-            cursor = conn.execute("SELECT COUNT(id_attempt) FROM attempts WHERE id_quiz = ?", (quiz_id,))
+            cursor = conn.execute("SELECT COUNT(id_attempt) FROM attempts WHERE id_quiz = ? AND id_user = ?", (quiz_id, user_id))
             return cursor.fetchone()[0]
         finally:
             conn.close()
@@ -166,8 +176,8 @@ class Database:
             with conn:
                 answers_json = json.dumps(attempt.answers)
                 conn.execute(
-                    "INSERT INTO attempts (id_quiz, score, time, answers, attempt_number) VALUES (?, ?, ?, ?, ?)",
-                    (attempt.id_quiz, attempt.score, attempt.time, answers_json, attempt.attempt_number)
+                    "INSERT INTO attempts (id_quiz, id_user, score, time, answers, attempt_number) VALUES (?, ?, ?, ?, ?, ?)",
+                    (attempt.id_quiz, attempt.id_user, attempt.score, attempt.time, answers_json, attempt.attempt_number)
                 )
         finally:
             conn.close()
@@ -193,6 +203,112 @@ class Database:
             """)
             attempts_data = cursor.fetchall()
             return [dict(row) for row in attempts_data]
+        finally:
+            conn.close()
+
+    def add_user(self, user: User) -> int:
+        """Adiciona um novo usuário ao banco de dados."""
+        conn = self._get_connection()
+        try:
+            with conn:
+                cursor = conn.execute(
+                    "INSERT INTO users (name, email) VALUES (?, ?)",
+                    (user.name, user.email)
+                )
+                return cursor.lastrowid
+        except sqlite3.IntegrityError:
+            raise Exception(f"O email '{user.email}' já está cadastrado.")
+        finally:
+            conn.close()
+
+    def get_all_users(self) -> list:
+        """Busca todos os usuários cadastrados."""
+        conn = self._get_connection()
+        try:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.execute("SELECT id_user, name, email FROM users ORDER BY name")
+            users = cursor.fetchall()
+            return [dict(row) for row in users]
+        finally:
+            conn.close()
+
+    def get_user_by_id(self, user_id: int) -> User | None:
+        """Busca um usuário pelo seu ID."""
+        conn = self._get_connection()
+        try:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.execute("SELECT * FROM users WHERE id_user = ?", (user_id,))
+            user_row = cursor.fetchone()
+            if not user_row:
+                return None
+            return User(id_user=user_row['id_user'], name=user_row['name'], email=user_row['email'])
+        finally:
+            conn.close()
+
+    def delete_quiz_by_id(self, quiz_id: int):
+        """Deleta um quiz e todas as suas dependências (questões, tentativas)."""
+        conn = self._get_connection()
+        try:
+            with conn:
+                conn.execute("DELETE FROM quizzes WHERE id_quiz = ?", (quiz_id,))
+        finally:
+            conn.close()
+
+    def get_attempts_by_user_id(self, user_id: int) -> list:
+        """
+        Busca todas as tentativas de um usuário específico com detalhes para relatórios.
+        """
+        conn = self._get_connection()
+        try:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.execute("""
+                SELECT
+                    a.id_attempt, a.id_quiz, a.id_user, a.score, a.answers, a.timestamp,
+                    (
+                        SELECT SUM(
+                            CASE
+                                WHEN qu.difficulty = 1 THEN CAST(json_extract(?, '$.difficulty_weights."1"') AS INTEGER)
+                                WHEN qu.difficulty = 2 THEN CAST(json_extract(?, '$.difficulty_weights."2"') AS INTEGER)
+                                WHEN qu.difficulty = 3 THEN CAST(json_extract(?, '$.difficulty_weights."3"') AS INTEGER)
+                                ELSE 1
+                            END
+                        )
+                        FROM questions qu WHERE qu.id_quiz = a.id_quiz
+                    ) as max_possible_score
+                FROM attempts a
+                WHERE a.id_user = ?
+            """, (json.dumps(settings), json.dumps(settings), json.dumps(settings), user_id))
+            attempts = cursor.fetchall()
+            return [dict(row) for row in attempts]
+        finally:
+            conn.close()
+
+    def get_all_attempts_for_ranking(self) -> list:
+        """Busca todas as tentativas para calcular o ranking de usuários."""
+        conn = self._get_connection()
+        try:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.execute("""
+                SELECT
+                    a.id_user,
+                    u.name as user_name,
+                    a.score,
+                    (
+                        SELECT SUM(
+                            CASE
+                                WHEN qu.difficulty = 1 THEN CAST(json_extract(?, '$.difficulty_weights."1"') AS INTEGER)
+                                WHEN qu.difficulty = 2 THEN CAST(json_extract(?, '$.difficulty_weights."2"') AS INTEGER)
+                                WHEN qu.difficulty = 3 THEN CAST(json_extract(?, '$.difficulty_weights."3"') AS INTEGER)
+                                ELSE 1
+                            END
+                        )
+                        FROM questions qu WHERE qu.id_quiz = a.id_quiz
+                    ) as max_possible_score
+                FROM attempts a
+                JOIN users u ON a.id_user = u.id_user
+            """, (json.dumps(settings), json.dumps(settings), json.dumps(settings)))
+            attempts = cursor.fetchall()
+            return [dict(row) for row in attempts]
         finally:
             conn.close()
 

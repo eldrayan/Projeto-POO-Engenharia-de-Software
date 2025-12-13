@@ -1,26 +1,45 @@
+import re
+
 class User:
     """
-    Representa o perfil do usuário único do sistema, agregando suas estatísticas.
+    Representa um usuário do sistema.
 
     Atributos:
         id_user (int): O identificador único do usuário.
-        attempt_counter (int): O número total de tentativas de quiz.
+        name (str): O nome do usuário.
+        email (str): O email do usuário, usado para identificação.
     """
-    def __init__(self, id_user: int = 1, attempt_counter: int = 0) -> None:
+    def __init__(self, name: str, email: str, id_user: int | None = None) -> None:
         """Inicializa um objeto User."""
-        self.__id_user = id_user
-        self.__attempt_counter = attempt_counter
+        self.id_user = id_user
+        self._name = None
+        self.name = name
+        self.email = email
 
     @property
-    def id_user(self):
-        """O ID fixo do usuário único."""
-        return self.__id_user
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError("O nome não pode estar vazio.")
+        if self._name is not None and value == self._name:
+            raise ValueError("O novo nome não pode ser o mesmo que o nome atual.")
+        self._name = value
 
     @property
-    def attempt_counter(self):
-        """Retorna o número de tentativas realizadas."""
-        return self.__attempt_counter
+    def email(self):
+        return self._email
 
-    def increment_attempts(self):
-        """Incrementa o contador de tentativas."""
-        self.__attempt_counter += 1
+    @email.setter
+    def email(self, value):
+        if not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", value):
+            raise ValueError("O formato do email fornecido é inválido.")
+        self._email = value
+
+    def __str__(self) -> str:
+        return f"User(ID: {self.id_user}, Name: {self.name}, Email: {self.email})"
+
+    def __repr__(self) -> str:
+        return self.__str__()

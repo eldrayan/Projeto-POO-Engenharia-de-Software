@@ -12,10 +12,11 @@ class Attempt:
         answers (list): Uma lista de respostas dadas pelo usuário.
         attempt_number (int): O número desta tentativa.
     """
-    def __init__(self, id_attempt: int, id_quiz: int, score: int, time: float, answers: List[Any], attempt_number: int) -> None:
+    def __init__(self, id_attempt: int, id_quiz: int, id_user: int, score: int, time: float, answers: List[Any], attempt_number: int) -> None:
         """Inicializa um novo registro de tentativa."""
         self.__id_attempt = id_attempt
         self.__id_quiz = id_quiz
+        self.__id_user = id_user
         self.__score = score
         self.__time = time
         self.__answers = answers
@@ -28,6 +29,10 @@ class Attempt:
     @property
     def id_quiz(self):
         return self.__id_quiz
+
+    @property
+    def id_user(self):
+        return self.__id_user
 
     @property
     def score(self):
