@@ -15,7 +15,7 @@ A modelagem do sistema foi dividida nas seguintes classes, atributos e métodos 
 
 | Classe | Atributos | Métodos Principais |
 | :--- | :--- | :--- |
-| **User** | `id_user`, `email`, `name` | `answer_quiz()` |
+| **User** | `id_user`, `email`, `name` | `(Nenhum - Classe de modelo)` |
 | **Question (Base)** | `id_question`, `statement`, `difficulty`, `theme` | `__str__()`, `__eq__()` |
 | **MultipleChoiceQuestion**| `(Herda de Question)` `alternatives`, `correct_answer` | `__str__()` (sobrescrito) |
 | **Quiz** | `id_quiz`, `title`, `questions`, `attempt_limit`, `time_limit` | `__str__()`, `__len__()`, `__iter__()` |
@@ -30,7 +30,7 @@ Aqui está o diagrama de classes UML que representa a estrutura do sistema:
 
 ```mermaid
 ---
-title: Diagrama de Classes - Quiz
+title: Diagrama de Classes - Quiz (Atualizado)
 ---
 classDiagram
     %% 1. Generalização (Herança)
@@ -49,7 +49,7 @@ classDiagram
     }
     Question <|-- MultipleChoiceQuestion : Herda de
 
-    %% 2. Agregação (Tem-um)
+    %% 2. Composição e Agregação
     class Quiz {
         +id_quiz
         +title
@@ -60,19 +60,18 @@ classDiagram
         +__len__()
         +__iter__()
     }
-    %% O Quiz é composto por Questions
-    Quiz "1" o-- "N" Question : Agrega
+    %% O Quiz é composto por Questions (relação forte)
+    Quiz "1" *-- "N" Question : Compõe
 
     class User {
         +id_user
         +email
         +name
-        +answer_quiz()
     }
-    %% O User possui um histórico de Attempts
+    %% O User possui um histórico de Attempts (relação fraca)
     User "1" o-- "N" Attempt : Possui histórico
 
-    %% 3. Associação Simples (Conhece-um)
+    %% 3. Associação
     class Attempt {
         +id_attempt
         +id_quiz
@@ -83,8 +82,9 @@ classDiagram
         +attempt_number
         +__str__()
     }
-    %% A Attempt precisa saber qual é o Quiz
+    %% Uma Tentativa está associada a um Quiz e a um User
     Attempt "*" --> "1" Quiz : Referencia
+    Attempt "*" --> "1" User : Referencia
 
     %% 4. Dependência (Usa-um)
     class Statistics {
@@ -99,11 +99,9 @@ classDiagram
         +settings
     }
 
-    %% Dependências
+    %% Dependências de serviço
     Statistics ..> User : Processa dados de
     Statistics ..> Attempt : Processa dados de
-    
-    User ..> Quiz : Depende (para responder)
     Quiz ..> ConfigModule : Consulta config
 ```
 
@@ -111,45 +109,49 @@ classDiagram
 
 O sistema utiliza os quatro tipos principais de relacionamentos da Orientação a Objetos para estruturar os dados e as regras de negócio:
 
-### 2.3 MER do projeto com o SQLite (Até o momento)
+### 2.3 MER do projeto com o SQLite finalizado
 
 ```mermaid
 ---
-title: Modelo de Entidade-Relacionamento - Quiz
+title: Modelo de Entidade-Relacionamento - Quiz (Atualizado)
 ---
 erDiagram
     USERS {
         INTEGER id_user PK
-        TEXT email
-        TEXT name
+        TEXT email UNIQUE "Email do usuário"
+        TEXT name "Nome do usuário"
     }
 
     QUIZZES {
         INTEGER id_quiz PK
-        TEXT title
-        INTEGER attempt_limit
-        INTEGER time_limit
+        TEXT title "Título do quiz"
+        INTEGER attempt_limit "Limite de tentativas"
+        INTEGER time_limit "Tempo limite em minutos"
     }
 
     QUESTIONS {
         INTEGER id_question PK
         INTEGER quiz_id FK
-        TEXT statement
-        TEXT alternatives
-        INTEGER correct_answer
+        TEXT statement "Enunciado da questão"
+        TEXT alternatives "Alternativas em JSON"
+        INTEGER correct_answer "Índice da resposta correta"
+        TEXT difficulty "Nível (Fácil, Médio, Difícil)"
+        TEXT theme "Tema da questão"
     }
 
     ATTEMPTS {
         INTEGER id_attempt PK
         INTEGER user_id FK
         INTEGER quiz_id FK
-        INTEGER score
-        TEXT answers
+        INTEGER score "Pontuação obtida"
+        REAL time "Tempo gasto em segundos"
+        TEXT answers "Respostas do usuário em JSON"
+        INTEGER attempt_number "Número da tentativa"
     }
 
     USERS ||--|{ ATTEMPTS : "realiza"
     QUIZZES ||--|{ QUESTIONS : "contém"
-    QUIZZES ||--|{ ATTEMPTS : "é alvo de"
+    QUIZZES ||--|{ ATTEMPTS : "é respondido em"
 ```
 
 #### 1. Generalização/Especialização (Herança)
@@ -160,30 +162,29 @@ Representa a relação "é-um-tipo-de".
     * Ela herda automaticamente atributos comuns como `statement` (enunciado), `difficulty` (dificuldade) e `theme` (tema).
     * Ela estende a classe base adicionando atributos exclusivos: `alternatives` (lista de opções) e `correct_answer` (índice da resposta).
 
-#### 2. Agregação ("Tem-um")
-Representa a relação onde um objeto é composto por uma coleção de outros objetos.
+#### 2. Composição e Agregação
+Representam relações "tem-um", mas com forças diferentes.
 
-* **`Quiz` <>— `Question`** - **1 para N**
-    * Um objeto `Quiz` **agrega** uma lista de objetos `Question` (ou suas filhas, `MultipleChoiceQuestion`).
-    * A relação é de agregação porque as perguntas podem existir independentemente do quiz.
-* **`User` <>— `Attempt`** - **1 para N**
-    * Um `User` **possui** um histórico (lista) de várias `Attempt` (tentativas). Isso permite gerar relatórios de evolução do usuário ao longo do tempo.
+* **Composição: `Quiz` *— `Question`** - **1 para N**
+    * Um objeto `Quiz` **é composto por** uma lista de objetos `Question`.
+    * A relação é de **Composição** (a forma mais forte de agregação), pois o ciclo de vida de uma `Question` está atrelado ao de um `Quiz`. No banco de dados, isso é refletido pela chave estrangeira `quiz_id` na tabela `QUESTIONS`. Uma pergunta não existe sem um quiz.
+* **Agregação: `User` o— `Attempt`** - **1 para N**
+    * Um `User` **possui** um histórico (agrega) de várias `Attempt` (tentativas).
+    * É uma relação "tem-um" mais fraca, onde as tentativas são agrupadas sob um usuário, mas têm seu próprio significado.
 
-#### 3. Associação Simples ("Conhece-um")
+#### 3. Associação ("Conhece-um")
 Representa uma conexão direta onde um objeto precisa fazer referência a outro para funcionar, geralmente através de Identificadores Únicos.
 
-* **`Attempt` → `Quiz`** - **N para 1**
-    * Cada objeto `Attempt` (tentativa) está associado a exatamente **um** `Quiz`.
-    * Essa associação é vital para garantir que os resultados (`score`, `time`) sejam atribuídos a pessoa e a prova corretas.
+* **`Attempt` → `Quiz` e `User`** - **N para 1**
+    * Cada objeto `Attempt` (tentativa) está associado a exatamente **um** `Quiz` e a **um** `User`.
+    * Essa associação é vital para registrar quem realizou qual quiz e qual foi o resultado.
 
 #### 4. Dependência ("Usa-um")
 Representa uma relação mais fraca, onde uma classe "usa" outra temporariamente sem mantê-la como atributo fixo.
 
-* **`Statistics` (Classe de Serviço) → `User`, `Attempt` e `Quiz`**
-    * A classe `Statistics` **depende** das classes `User`, `Attempt` e `Quiz` para funcionar.
+* **`Statistics` (Classe de Serviço) → `User` e `Attempt`**
+    * A classe `Statistics` **depende** dos modelos `User` e `Attempt` para funcionar.
     * Seus métodos recebem listas desses objetos para processar cálculos e gerar relatórios analíticos.
-* **`User` → `Quiz`**
-    * A classe `User` tem uma dependência temporária do `Quiz` (através do método `answer_quiz`) para poder respondê-lo.
 * **`Quiz` → `Settings`**
     * A classe `Quiz` consulta as configurações globais para definir seus valores padrão ou validar limites.
 
@@ -191,10 +192,10 @@ Representa uma relação mais fraca, onde uma classe "usa" outra temporariamente
 ## 3. Visão Geral
 
 * [X] **Modelagem OO:** Definição das classes, atributos, métodos e relacionamentos.
-* [ ] **Criação de Perguntas:** Cadastrar perguntas de múltipla escolha com validações.
-* [ ] **Montagem de Quizzes:** Criar quizzes a partir de um conjunto de perguntas.
-* [ ] **Execução de Quizzes:** Permitir que usuários respondam quizzes e registrar seus resultados.
-* [ ] **Usuários e Tentativas:** Cadastrar usuários e salvar seu histórico de tentativas.
-* [ ] **Relatórios:** Gerar estatísticas de desempenho, rankings e mais.
+* [X] **Criação de Perguntas:** Cadastrar perguntas de múltipla escolha com validações.
+* [X] **Montagem de Quizzes:** Criar quizzes a partir de um conjunto de perguntas.
+* [X] **Execução de Quizzes:** Permitir que usuários respondam quizzes e registrar seus resultados.
+* [X] **Usuários e Tentativas:** Cadastrar usuários e salvar seu histórico de tentativas.
+* [X] **Relatórios:** Gerar estatísticas de desempenho, rankings e mais.
 * [X] **Persistência:** Salvar e carregar dados em JSON ou SQLite.
 * [X] **Testes:** Cobertura de testes com `pytest`.
