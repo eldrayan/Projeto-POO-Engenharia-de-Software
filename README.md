@@ -1,5 +1,5 @@
 
-**Status:** Concluído (Entrega Final)
+**Status:** Em Desenvolvimento (Entrega da Semana 3: Herança e DB)
 
 ## 1. Descrição do Projeto
 
@@ -113,40 +113,40 @@ O sistema utiliza os quatro tipos principais de relacionamentos da Orientação 
 
 ```mermaid
 ---
-title: Modelo de Entidade-Relacionamento - Quiz (Atualizado)
+title: Modelo de Entidade-Relacionamento - Quiz 
 ---
 erDiagram
     USERS {
         INTEGER id_user PK
-        TEXT email UNIQUE
-        TEXT name
+        TEXT email UK "Email do usuário"
+        TEXT name "Nome do usuário"
     }
 
     QUIZZES {
         INTEGER id_quiz PK
-        TEXT title
-        INTEGER attempt_limit
-        INTEGER time_limit
+        TEXT title "Título do quiz"
+        INTEGER attempt_limit "Limite de tentativas"
+        INTEGER time_limit "Tempo limite em minutos"
     }
 
     QUESTIONS {
         INTEGER id_question PK
         INTEGER quiz_id FK
-        TEXT statement
-        TEXT alternatives
-        INTEGER correct_answer
-        TEXT difficulty
-        TEXT theme
+        TEXT statement "Enunciado da questão"
+        TEXT alternatives "Alternativas em JSON"
+        INTEGER correct_answer "Índice da resposta correta"
+        TEXT difficulty "Nível (Fácil, Médio, Difícil)"
+        TEXT theme "Tema da questão"
     }
 
     ATTEMPTS {
         INTEGER id_attempt PK
         INTEGER user_id FK
         INTEGER quiz_id FK
-        INTEGER score
-        REAL time
-        TEXT answers
-        INTEGER attempt_number
+        INTEGER score "Pontuação obtida"
+        REAL time "Tempo gasto em segundos"
+        TEXT answers "Respostas do usuário em JSON"
+        INTEGER attempt_number "Número da tentativa"
     }
 
     USERS ||--|{ ATTEMPTS : "realiza"
