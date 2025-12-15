@@ -1,6 +1,3 @@
-
-**Status:** Em Desenvolvimento (Entrega da Semana 3: Herança e DB)
-
 ## 1. Descrição do Projeto
 
 Este projeto tem como objetivo o desenvolvimento de um sistema de quiz educacional. O sistema será uma aplicação de linha de comando (CLI) que permite aos usuários criar, gerenciar e responder quizzes com perguntas de múltipla escolha.
@@ -9,7 +6,110 @@ O sistema controlará a pontuação, o desempenho por tema, estatísticas de ace
 
 O foco principal do projeto é a aplicação correta de conceitos de Programação Orientada a Objetos (POO), incluindo Herança, Encapsulamento e Composição.
 
-## 2. Estrutura Planejada de Classes (UML Textual)
+## 2. Status do Projeto
+
+* [X] **Modelagem OO:** Definição das classes, atributos, métodos e relacionamentos.
+* [X] **Criação de Perguntas:** Cadastrar perguntas de múltipla escolha com validações.
+* [X] **Montagem de Quizzes:** Criar quizzes a partir de um conjunto de perguntas.
+* [X] **Execução de Quizzes:** Permitir que usuários respondam quizzes e registrar seus resultados.
+* [X] **Usuários e Tentativas:** Cadastrar usuários e salvar seu histórico de tentativas.
+* [X] **Relatórios:** Gerar estatísticas de desempenho, rankings e mais.
+* [X] **Persistência:** Salvar e carregar dados em JSON ou SQLite.
+* [X] **Testes:** Cobertura de testes com `pytest`.
+
+## 3. Como Usar
+
+### 3.1. Pré-requisitos
+
+*   Python 3.10 ou superior
+*   pip (gerenciador de pacotes do Python)
+
+### 3.2. Instalação
+
+1.  **Clone o repositório:**
+    ```bash
+    git clone https://github.com/seu-usuario/Projeto-POO-Engenharia-de-Software.git
+    cd Projeto-POO-Engenharia-de-Software
+    ```
+
+2.  **Crie e ative um ambiente virtual:**
+    ```bash
+    # Windows
+    python -m venv .venv
+    .\.venv\Scripts\activate
+
+    # Linux / macOS
+    python3 -m venv .venv
+    source .venv/bin/activate
+    ```
+
+3.  **Instale as dependências:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+### 3.3. Configuração
+
+O arquivo `settings.json` na raiz do projeto controla o comportamento da aplicação:
+
+*   `database_file`: Nome do arquivo do banco de dados SQLite que será criado.
+*   `default_attempt_limit`: Número máximo de vezes que um usuário pode tentar responder a um quiz.
+*   `min_questions_per_quiz`: Quantidade mínima de perguntas necessárias para criar um novo quiz.
+*   `difficulty_weights`: Pesos usados para calcular a pontuação final. A pontuação de uma questão é multiplicada pelo peso de sua dificuldade.
+
+### 3.4. Execução
+
+Para iniciar a aplicação, execute o módulo `quiz` a partir da raiz do projeto. Isso irá configurar o banco de dados (se for a primeira vez) e abrir a interface de linha de comando:
+
+```bash
+python -m quiz
+```
+
+### 3.5. Comandos Disponíveis
+
+A aplicação funciona com os seguintes comandos:
+
+*   **`register`**: Cadastra um novo usuário no sistema.
+    ```bash
+    python -m quiz register
+    ```
+
+*   **`create`**: Inicia um assistente interativo para criar um novo quiz, adicionando perguntas, alternativas, tema e dificuldade.
+    ```bash
+    python -m quiz create
+    ```
+
+*   **`take`**: Permite que um usuário registrado escolha e responda a um dos quizzes disponíveis.
+    ```bash
+    python -m quiz take
+    ```
+
+*   **`delete`**: Remove um quiz do sistema.
+    ```bash
+    python -m quiz delete
+    ```
+
+*   **`report`**: Gera relatórios de desempenho. Este comando possui subcomandos:
+    *   `performance`: Desempenho detalhado de um usuário.
+    *   `ranking`: Ranking de todos os usuários com base na pontuação.
+    *   `missed-questions`: As perguntas que os usuários mais erram.
+    *   `evolution`: Histórico de tentativas de um usuário em um quiz específico.
+    ```bash
+    python -m quiz report performance
+    python -m quiz report ranking
+    ```
+
+### 3.6. Executando os Testes
+
+Para verificar a integridade do código e garantir que todas as funcionalidades operam como esperado, execute a suíte de testes com o `pytest`.
+
+```bash
+pytest -v
+```
+
+## 4. Modelagem e Arquitetura
+
+### 4.1. Estrutura Planejada de Classes (UML Textual)
 
 A modelagem do sistema foi dividida nas seguintes classes, atributos e métodos principais, conforme o solicitado:
 
@@ -24,13 +124,13 @@ A modelagem do sistema foi dividida nas seguintes classes, atributos e métodos 
 
 ---
 
-### 2.1. Diagrama de Classes (UML)
+### 4.2. Diagrama de Classes (UML)
 
 Aqui está o diagrama de classes UML que representa a estrutura do sistema:
 
 ```mermaid
 ---
-title: Diagrama de Classes - Quiz (Atualizado)
+title: Diagrama de Classes - Quiz
 ---
 classDiagram
     %% 1. Generalização (Herança)
@@ -105,15 +205,11 @@ classDiagram
     Quiz ..> ConfigModule : Consulta config
 ```
 
-### 2.2. Relacionamentos Principais
-
-O sistema utiliza os quatro tipos principais de relacionamentos da Orientação a Objetos para estruturar os dados e as regras de negócio:
-
-### 2.3 MER do projeto com o SQLite finalizado
+### 4.3. Modelo de Entidade-Relacionamento (MER)
 
 ```mermaid
 ---
-title: Modelo de Entidade-Relacionamento - Quiz 
+title: Modelo de Entidade-Relacionamento - Quiz
 ---
 erDiagram
     USERS {
@@ -154,6 +250,10 @@ erDiagram
     QUIZZES ||--|{ ATTEMPTS : "é respondido em"
 ```
 
+### 4.4. Relacionamentos Principais
+
+O sistema utiliza os quatro tipos principais de relacionamentos da Orientação a Objetos para estruturar os dados e as regras de negócio:
+
 #### 1. Generalização/Especialização (Herança)
 Representa a relação "é-um-tipo-de".
 
@@ -187,15 +287,3 @@ Representa uma relação mais fraca, onde uma classe "usa" outra temporariamente
     * Seus métodos recebem listas desses objetos para processar cálculos e gerar relatórios analíticos.
 * **`Quiz` → `Settings`**
     * A classe `Quiz` consulta as configurações globais para definir seus valores padrão ou validar limites.
-
-
-## 3. Visão Geral
-
-* [X] **Modelagem OO:** Definição das classes, atributos, métodos e relacionamentos.
-* [X] **Criação de Perguntas:** Cadastrar perguntas de múltipla escolha com validações.
-* [X] **Montagem de Quizzes:** Criar quizzes a partir de um conjunto de perguntas.
-* [X] **Execução de Quizzes:** Permitir que usuários respondam quizzes e registrar seus resultados.
-* [X] **Usuários e Tentativas:** Cadastrar usuários e salvar seu histórico de tentativas.
-* [X] **Relatórios:** Gerar estatísticas de desempenho, rankings e mais.
-* [X] **Persistência:** Salvar e carregar dados em JSON ou SQLite.
-* [X] **Testes:** Cobertura de testes com `pytest`.
