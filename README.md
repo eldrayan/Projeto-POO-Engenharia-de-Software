@@ -1,5 +1,5 @@
 
-**Status:** Em Desenvolvimento (Entrega da Semana 3: Herança e DB)
+**Status:** Concluído (Entrega Final)
 
 ## 1. Descrição do Projeto
 
@@ -118,35 +118,35 @@ title: Modelo de Entidade-Relacionamento - Quiz (Atualizado)
 erDiagram
     USERS {
         INTEGER id_user PK
-        TEXT email UNIQUE "Email do usuário"
-        TEXT name "Nome do usuário"
+        TEXT email UNIQUE
+        TEXT name
     }
 
     QUIZZES {
         INTEGER id_quiz PK
-        TEXT title "Título do quiz"
-        INTEGER attempt_limit "Limite de tentativas"
-        INTEGER time_limit "Tempo limite em minutos"
+        TEXT title
+        INTEGER attempt_limit
+        INTEGER time_limit
     }
 
     QUESTIONS {
         INTEGER id_question PK
         INTEGER quiz_id FK
-        TEXT statement "Enunciado da questão"
-        TEXT alternatives "Alternativas em JSON"
-        INTEGER correct_answer "Índice da resposta correta"
-        TEXT difficulty "Nível (Fácil, Médio, Difícil)"
-        TEXT theme "Tema da questão"
+        TEXT statement
+        TEXT alternatives
+        INTEGER correct_answer
+        TEXT difficulty
+        TEXT theme
     }
 
     ATTEMPTS {
         INTEGER id_attempt PK
         INTEGER user_id FK
         INTEGER quiz_id FK
-        INTEGER score "Pontuação obtida"
-        REAL time "Tempo gasto em segundos"
-        TEXT answers "Respostas do usuário em JSON"
-        INTEGER attempt_number "Número da tentativa"
+        INTEGER score
+        REAL time
+        TEXT answers
+        INTEGER attempt_number
     }
 
     USERS ||--|{ ATTEMPTS : "realiza"
