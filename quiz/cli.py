@@ -27,6 +27,10 @@ def register_user():
     try:
         user_id = data.add_user(new_user)
         click.secho(f"Usuário '{name}' cadastrado com sucesso! ID: {user_id}", fg="green")
+
+        if click.confirm("\nDeseja responder a um quiz agora?"):
+            user = data.get_user_by_id(user_id)
+            _start_quiz_session(user)
     except Exception as e:
         click.secho(f"Erro ao cadastrar usuário: {e}", fg="red")
 
@@ -110,14 +114,8 @@ def list_quizzes():
         plural = "questão" if len(quiz_obj.questions) == 1 else "questões"
         click.echo(f"  ID {quiz_info['id_quiz']}: {quiz_info['title']} ({len(quiz_obj.questions)} {plural})")
 
-
-@cli.command("take")
-def run_quiz():
-    """Responde a um quiz."""
-    user = get_user_from_prompt()
-    if not user:
-        click.echo("Nenhum usuário encontrado. Cadastre um usuário com 'python -m quiz register'.")
-        return
+def _start_quiz_session(user: User):
+    """Lógica principal para um usuário responder a um quiz."""
     click.secho(f"\nUsuário selecionado: {user.name}", fg="cyan")
 
     quizzes = data.get_all_quizzes()
@@ -195,11 +193,21 @@ def run_quiz():
         
         is_correct = user_ans_idx == question.correct_answer
         click.echo(f"\nQ{i+1}: {question.statement}")
-        click.echo(f"  Sua resposta: {user_ans_text}", fg="green" if is_correct else "red")
+        click.secho(f"  Sua resposta: {user_ans_text}", fg="green" if is_correct else "red")
         if not is_correct:
             click.echo(f"  Resposta correta: {correct_ans_text}")
 
     click.secho("\nSua tentativa foi salva com sucesso.", fg="cyan")
+
+@cli.command("take")
+def run_quiz():
+    """Responde a um quiz."""
+    user = get_user_from_prompt()
+    if not user:
+        click.echo("Nenhum usuário encontrado. Cadastre um usuário com 'python -m quiz register'.")
+        return
+    _start_quiz_session(user)
+
 
 @cli.command("delete")
 def delete_quiz():
